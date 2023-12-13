@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minecraft
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: games
+  destination:
+    namespace: minecraft
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://github.com/itzg/minecraft-server-charts.git
+    path: charts/minecraft
+    targetRevision: minecraft-4.12.0
+    helm:
+      releaseName: minecraft
+      valuesObject:
+        host: minecraft.akira.cz
+        minecraftServer:
+          eula: "true"
+          type: "SPIGOT"
+          difficulty: normal
+          onlineMode: false
+          overrideServerProperties: true
+        persistence:
+          storageClass: longhorn
+          dataDir:
+            enabled: true
+            Size: 2Gi
