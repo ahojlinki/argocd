@@ -30,7 +30,7 @@ spec:
           difficulty: normal
           onlineMode: false
           overrideServerProperties: true
-          whitelist: ahojlinki, teri
+          # whitelist: ahojlinki, teri
           ops: ahojlinki, teri
         persistence:
           storageClass: longhorn
