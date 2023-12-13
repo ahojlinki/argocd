@@ -32,6 +32,7 @@ spec:
           overrideServerProperties: true
           # whitelist: ahojlinki, teri
           ops: ahojlinki
+          levelSeed: -8985846747452277621
         persistence:
           storageClass: longhorn
           dataDir:
