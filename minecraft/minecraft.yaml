@@ -30,8 +30,8 @@ spec:
           difficulty: normal
           onlineMode: false
           overrideServerProperties: true
-          # whitelist: ahojlinki, teri
-          ops: ahojlinki, teri
+          whitelist: whitelist.json
+          ops: ops.json
         persistence:
           storageClass: longhorn
           dataDir:
