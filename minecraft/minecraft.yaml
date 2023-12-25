@@ -24,17 +24,16 @@ spec:
       releaseName: minecraft
       valuesObject:
         host: minecraft.akira.cz
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m
         minecraftServer:
           eula: "true"
-          type: "SPIGOT"
-          difficulty: normal
           onlineMode: false
           overrideServerProperties: true
-          # whitelist: ahojlinki, teri
-          # ops: "ahojlinki"
-          levelSeed: "-8985846747452277621"
         persistence:
-          storageClass: longhorn
+          storageClass: nfs-csi
           dataDir:
             enabled: true
             Size: 2Gi
