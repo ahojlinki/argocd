@@ -394,11 +394,11 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: nfs-csi
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
-    enabled: false
-    Size: 1Gi
+    enabled: true
+    Size: 2Gi
     # existingClaim: nil
     ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
     # subPath: /path/to/dataDir
