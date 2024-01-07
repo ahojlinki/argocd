@@ -18,7 +18,7 @@ resources:
     memory: 512Mi
     cpu: 500m
   limits:
-    memory: 768Mi
+    memory: 1280Mi
 
 lifecycle:
   postStart: []
@@ -399,7 +399,7 @@ persistence:
   # storageClass: "-"
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
-    enabled: true
+    enabled: false
     Size: 1Gi
     # existingClaim: nil
     ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
