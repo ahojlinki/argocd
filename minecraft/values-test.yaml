@@ -8,7 +8,7 @@ image:
 # ### WARNING ###
 # Minecraft is not horizontally scalable, adjusting this will most likely break your setup.
 # ### WARNING ###
-replicaCount: 0
+replicaCount: 1
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
