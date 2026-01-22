@@ -53,7 +53,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-      - ALL
+    - ALL
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
 
@@ -61,7 +61,7 @@ securityContext:
 # https://hub.docker.com/r/itzg/minecraft-server/
 livenessProbe:
   command:
-    - mc-health
+  - mc-health
   initialDelaySeconds: 30
   periodSeconds: 5
   failureThreshold: 10
@@ -69,7 +69,7 @@ livenessProbe:
   timeoutSeconds: 1
 readinessProbe:
   command:
-    - mc-health
+  - mc-health
   initialDelaySeconds: 30
   periodSeconds: 5
   failureThreshold: 20
@@ -77,7 +77,7 @@ readinessProbe:
   timeoutSeconds: 1
 startupProbe:
   command:
-    - mc-health
+  - mc-health
   enabled: false
   failureThreshold: 30
   periodSeconds: 10
@@ -117,7 +117,6 @@ sidecarContainers: []
 #           - vers=4
 extraVolumes: []
 
-
 ## Array of extra objects to deploy with the release
 ##
 # extraDeploy:
@@ -141,31 +140,32 @@ minecraftServer:
   # This can be one of "VANILLA", "FORGE", "SPIGOT", "BUKKIT", "PAPER", "FTBA", "SPONGEVANILLA", "CURSEFORGE"
   type: "SPIGOT"
   # If type is set to FORGE, this sets the version; this is ignored if forgeInstallerUrl is set
-  forgeVersion:
-  # If type is set to SPONGEVANILLA, this sets the version
-  spongeVersion:
-  # If type is set to FORGE, this sets the URL to download the Forge installer
-  forgeInstallerUrl:
-  # If type is set to BUKKIT, this sets the URL to download the Bukkit package
-  bukkitDownloadUrl:
-  # If type is set to SPIGOT, this sets the URL to download the Spigot package
-  spigotDownloadUrl:
-  # If type is set to PAPER, this sets the URL to download the PaperSpigot package
-  paperDownloadUrl:
-  # If type is set to FTBA, this sets the modpack to run
-  ftbModpackId:
-  # If type is set to FTBA and a modpack is set, this sets the version to run
-  ftbModpackVersionId:
-  # If type is set to CURSEFORGE, this sets the server mod to run. Can also provide url to curseforge package.
-  cfServerMod:
-  # Set to true if running Feed The Beast and get an error like "unable to launch forgemodloader"
+  forgeVersion: # If type is set to SPONGEVANILLA, this sets the version
+
+  spongeVersion: # If type is set to FORGE, this sets the URL to download the Forge installer
+
+  forgeInstallerUrl: # If type is set to BUKKIT, this sets the URL to download the Bukkit package
+
+  bukkitDownloadUrl: # If type is set to SPIGOT, this sets the URL to download the Spigot package
+
+  spigotDownloadUrl: # If type is set to PAPER, this sets the URL to download the PaperSpigot package
+
+  paperDownloadUrl: # If type is set to FTBA, this sets the modpack to run
+
+  ftbModpackId: # If type is set to FTBA and a modpack is set, this sets the version to run
+
+  ftbModpackVersionId: # If type is set to CURSEFORGE, this sets the server mod to run. Can also provide url to curseforge package.
+
+  cfServerMod: # Set to true if running Feed The Beast and get an error like "unable to launch forgemodloader"
+
   ftbLegacyJavaFixer: default
   # One of: peaceful, easy, normal, and hard
   difficulty: normal
   # A comma-separated list of player names to whitelist.
-  whitelist:
-  # A comma-separated list of player names who should be admins.
-  ops: 
+  whitelist: # A comma-separated list of player names who should be admins.
+
+  ops: Ahojlinki
+  
   # A server icon URL for server listings. Auto-scaled and transcoded.
   icon: https://www.mrk.cz/Data/Otazky/654602.jpg
   # Max connected players.
@@ -203,7 +203,9 @@ minecraftServer:
   # One of: creative, survival, adventure, spectator
   gameMode: survival
   # Message of the Day
-  motd: "\u00a72\u00a7lV\u00edtej \u00a7a\u00a7lna \u00a72\u00a7lserveru \u00a7e\u00a7l\u00a7nSuch\u00fd\u00a7e \u00a76\u00a7l\u00a7nRohl\u00edk\u00a7f \u263b\u00a7r\n\u00a74\u00a7l!!! \u00a74Jestli jsi Tom\u00e1\u0161 nebo Mirek tak t\u00e1hni do pekla \u00a74\u00a7l!!!"
+  motd: "§2§lVítej §a§lna §2§lserveru §e§l§nSuchý§e §6§l§nRohlík§f ☻§r
+
+    §4§l!!! §4Jestli jsi Tomáš nebo Mirek tak táhni do pekla §4§l!!!"
   # If true, enable player-vs-player damage.
   pvp: default
   # One of: DEFAULT, FLAT, LARGEBIOMES, AMPLIFIED, CUSTOMIZED
@@ -213,21 +215,21 @@ minecraftServer:
   generatorSettings:
   worldSaveName: world
   # If set, this URL will be downloaded at startup and used as a starting point
-  downloadWorldUrl:
-  # force re-download of server file
+  downloadWorldUrl: # force re-download of server file
+
   forceReDownload: false
   # If set, the modpack at this URL will be downloaded at startup
-  downloadModpackUrl:
-  # If true, old versions of downloaded mods will be replaced with new ones from downloadModpackUrl
+  downloadModpackUrl: # If true, old versions of downloaded mods will be replaced with new ones from downloadModpackUrl
+
   removeOldMods: false
   # A list of VanillaTweaks Share Codes to download. (https://vanillatweaks.net/share#wUq1iz => "wUq1iz")
   vanillaTweaksShareCodes: []
   # Optional URI to a resource pack. The player may choose to use it.
-  resourcePackUrl:
-  # Optional SHA-1 digest of the resource pack, in lowercase hexadecimal.
+  resourcePackUrl: # Optional SHA-1 digest of the resource pack, in lowercase hexadecimal.
+
   # It is recommended to specify this, because it is used to verify the integrity of the resource pack.
-  resourcePackSha:
-  # When true, players will be prompted for a response and will be disconnected if they decline the required pack
+  resourcePackSha: # When true, players will be prompted for a response and will be disconnected if they decline the required pack
+
   resourcePackEnforce: false
   # Check accounts against Minecraft account service.
   onlineMode: false
@@ -247,12 +249,12 @@ minecraftServer:
   serviceAnnotations: {}
   serviceType: ClusterIP
   ## Set the port used if the serviceType is NodePort
-  nodePort:
-  # Set the external port of the service, usefull when using the LoadBalancer service type
+  nodePort: # Set the external port of the service, usefull when using the LoadBalancer service type
+
   servicePort: 25565
   clusterIP:
-  loadBalancerIP:
-  # loadBalancerSourceRanges: []
+  loadBalancerIP: # loadBalancerSourceRanges: []
+
   ## Set the externalTrafficPolicy in the Service to either Cluster or Local
   # externalTrafficPolicy: Cluster
   externalIPs:
@@ -262,8 +264,8 @@ minecraftServer:
   modUrls: []
   pluginUrls:
   #  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/129/artifact/target/LoginSecurity-3.2.1-Spigot.jar
-    - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/lastStableBuild/artifact/target/LoginSecurity-Spigot-3.3.2-SNAPSHOT.jar
-  
+  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/lastStableBuild/artifact/target/LoginSecurity-Spigot-3.3.2-SNAPSHOT.jar
+
   # A list of Spigot resources/plugins IDs to download.
   spigetResources: []
 
@@ -327,13 +329,11 @@ minecraftServer:
     nodePort:
     clusterIP:
     loadBalancerIP:
-    # loadBalancerSourceRanges: []
-    ## Set the externalTrafficPolicy in the Service to either Cluster or Local
-    # externalTrafficPolicy: Cluster
+      # loadBalancerSourceRanges: []
+      ## Set the externalTrafficPolicy in the Service to either Cluster or Local
+      # externalTrafficPolicy: Cluster
 
-  extraPorts:
-    []
-
+  extraPorts: []
     # These options allow you to expose another port from the Minecraft server, plugins such
     # as dynmap (8123) and bluemap (8100) will require this for access to their web interfaces
     #
@@ -374,8 +374,7 @@ minecraftServer:
 ## Additional minecraft container environment variables
 ## Values can be either variable values or `valueFrom` yaml
 ##
-extraEnv:
-  {}
+extraEnv: {}
   # some_variable: some value
   # another_variable:
   #   valueFrom:
@@ -467,8 +466,8 @@ mcbackup:
 
   # see https://rclone.org/ for details
   # this value is evaluated as a template
-  rcloneConfig:
-  # [remote]
+  rcloneConfig: # [remote]
+
   # type = google cloud storage
   # client_id =
   # client_secret =
@@ -487,15 +486,12 @@ mcbackup:
   pruneResticRetention: "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75"
 
   # At least one of RESTIC_PASSWORD* env variables need to be defined, see https://restic.readthedocs.io/en/latest/030_preparing_a_new_repo.html
-  resticEnvs:
-    {}
-    # RESTIC_PASSWORD: restic-password
+  resticEnvs: {} # RESTIC_PASSWORD: restic-password
 
   ## Additional minecraft container environment variables
   ## Values can be either variable values or `valueFrom` yaml
   ##
-  extraEnv:
-    {}
+  extraEnv: {}
     # some_variable: some value
     # another_variable:
     #   valueFrom:
