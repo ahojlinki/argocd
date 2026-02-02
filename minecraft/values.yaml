@@ -264,7 +264,7 @@ minecraftServer:
   modUrls: []
   pluginUrls:
   #  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/129/artifact/target/LoginSecurity-3.2.1-Spigot.jar
-  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/lastStableBuild/artifact/target/LoginSecurity-Spigot-3.3.2-SNAPSHOT.jar
+  #  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/lastStableBuild/artifact/target/LoginSecurity-Spigot-3.3.2-SNAPSHOT.jar
 
   # A list of Spigot resources/plugins IDs to download.
   spigetResources: []
