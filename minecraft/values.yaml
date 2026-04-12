@@ -1,6 +1,6 @@
 # ref: https://hub.docker.com/r/itzg/minecraft-server/
 image:
-  repository: itzg/minecraft-server
+  repository: registry.akira.cz/docker/itzg/minecraft-server:latest
   tag: latest
   pullPolicy: IfNotPresent
   pullSecret: ""
@@ -165,7 +165,7 @@ minecraftServer:
   whitelist: # A comma-separated list of player names who should be admins.
 
   ops: Ahojlinki
-  
+
   # A server icon URL for server listings. Auto-scaled and transcoded.
   icon: https://www.mrk.cz/Data/Otazky/654602.jpg
   # Max connected players.
