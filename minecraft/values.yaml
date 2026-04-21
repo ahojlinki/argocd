@@ -182,7 +182,7 @@ minecraftServer:
   ## Common types: "VANILLA", "FABRIC", "FORGE", "SPIGOT", "BUKKIT", "PAPER",
   ## "FTBA", "SPONGEVANILLA", "AUTO_CURSEFORGE"
   ## ref: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms
-  type: "SPIGOT"
+  type: "VANILLA"
   # If type is set to FORGE, this sets the version; this is ignored if forgeInstallerUrl is set
   forgeVersion:
   # If type is set to FORGE, this sets the URL to download the Forge installer
@@ -452,11 +452,11 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: longhorn
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
-    enabled: false
-    Size: 1Gi
+    enabled: true
+    Size: 2Gi
     accessModes:
       - ReadWriteOnce
     # existingClaim: nil
