@@ -2,7 +2,7 @@
 image:
   repository: itzg/minecraft-server
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   pullSecret: ""
 
 # ### WARNING ###
@@ -20,6 +20,8 @@ resources:
   requests:
     memory: 512Mi
     cpu: 500m
+  limits:
+    memory: 2048Mi
 
 lifecycle:
   postStart: []
@@ -173,14 +175,14 @@ extraPodSpec: {}
 
 minecraftServer:
   # This must be overridden, since we can't accept this for the user.
-  eula: "FALSE"
+  eula: "true"
   # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
   version: "LATEST"
   ## The type of Minecraft server to run, check for related settings below
   ## Common types: "VANILLA", "FABRIC", "FORGE", "SPIGOT", "BUKKIT", "PAPER",
   ## "FTBA", "SPONGEVANILLA", "AUTO_CURSEFORGE"
   ## ref: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms
-  type: "VANILLA"
+  type: "SPIGOT"
   # If type is set to FORGE, this sets the version; this is ignored if forgeInstallerUrl is set
   forgeVersion:
   # If type is set to FORGE, this sets the URL to download the Forge installer
@@ -210,7 +212,7 @@ minecraftServer:
   # Set to true if running Feed The Beast and get an error like "unable to launch forgemodloader"
   ftbLegacyJavaFixer: default
   # One of: peaceful, easy, normal, and hard
-  difficulty: easy
+  difficulty: normal
   # A comma-separated list of player names to whitelist.
   whitelist:
   # A comma-separated list of player names who should be admins.
