@@ -2,13 +2,16 @@
 image:
   repository: itzg/minecraft-server
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   pullSecret: ""
 
 # ### WARNING ###
 # Minecraft is not horizontally scalable, adjusting this will most likely break your setup.
 # ### WARNING ###
 replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -17,8 +20,6 @@ resources:
   requests:
     memory: 512Mi
     cpu: 500m
-  limits:
-    memory: 2048Mi
 
 lifecycle:
   postStart: []
@@ -42,9 +43,11 @@ tolerations: []
 
 affinity: {}
 
+revisionHistoryLimit: 10
+
 podSecurityContext:
   runAsUser: 1000
-  runAsGroup: 2000
+  runAsGroup: 3000
   runAsNonRoot: true
   fsGroup: 2000
   seccompProfile:
@@ -53,7 +56,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
 
@@ -61,15 +64,15 @@ securityContext:
 # https://hub.docker.com/r/itzg/minecraft-server/
 livenessProbe:
   command:
-  - mc-health
+    - mc-health
   initialDelaySeconds: 30
   periodSeconds: 5
-  failureThreshold: 10
+  failureThreshold: 20
   successThreshold: 1
   timeoutSeconds: 1
 readinessProbe:
   command:
-  - mc-health
+    - mc-health
   initialDelaySeconds: 30
   periodSeconds: 5
   failureThreshold: 20
@@ -77,29 +80,51 @@ readinessProbe:
   timeoutSeconds: 1
 startupProbe:
   command:
-  - mc-health
+    - mc-health
   enabled: false
   failureThreshold: 30
   periodSeconds: 10
 
+## Array of initContainers to add to include in deployment (supports templating)
+##
 # initContainers:
 #   - name: do-something
 #     image: busybox
 #     command: ['do', 'something']
-#     volumesMounts:
+#     volumeMounts:
+#       - name: nfs
+#         mountPath: /mnt/volume
+#         readOnly: true
+#   - |
+#     name: {{ template "minecraft.fullname" . }}-init
+#     image: busybox
+#     command: ['do', 'something']
+#     volumeMounts:
 #       - name: nfs
 #         mountPath: /mnt/volume
 #         readOnly: true
 initContainers: []
 
+## Array of additional sidecards to include in the deployment (supports templating)
+##
 # sidecarContainers:
 #   - name: do-something
 #     image: busybox
 #     command: ['do', 'something']
-#     volumesMounts:
+#     volumeMounts:
 #       - name: nfs
 #         mountPath: /mnt/volume
 #         readOnly: true
+#   - |
+#     name: {{ template "minecraft.fullname" . }}-sidecar
+#     image: busybox
+#     command: ['do', 'something', 'with', 'rcon']
+#     env:
+#       - name: RCON_PASSWORD
+#         valueFrom:
+#           secretKeyRef:
+#             name: '{{ .Values.minecraftServer.rcon.existingSecret | default (printf "%s-rcon" (include "minecraft.fullname" .)) }}'
+#             key: "{{ .Values.minecraftServer.rcon.secretKey | default "rcon-password" }}"
 sidecarContainers: []
 
 # extraVolumes:
@@ -109,13 +134,15 @@ sidecarContainers: []
 #         readOnly: true
 #     volumes:
 #       - name: nfs
-#         server: some.nfs.server.com
-#         path: /
-#         mountOptions:
-#           - port=2049
-#           - hard
-#           - vers=4
+#         nfs:
+#           server: some.nfs.server.com
+#           path: /
+#           mountOptions:
+#             - port=2049
+#             - hard
+#             - vers=4
 extraVolumes: []
+
 
 ## Array of extra objects to deploy with the release
 ##
@@ -132,46 +159,68 @@ extraVolumes: []
 #         }
 extraDeploy: []
 
+## Extra fields to set on the pod
+##
+## Fields set here will be added to the end of the Pod spec
+## Can include any fields from https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+## that are not already set by the chart.
+##
+## The value of the field will be interpretted as a template.
+##
+# extraPodSpec:
+#   priorityClassName: 'my-priority-class'
+extraPodSpec: {}
+
 minecraftServer:
   # This must be overridden, since we can't accept this for the user.
-  eula: "true"
+  eula: "FALSE"
   # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
   version: "LATEST"
-  # This can be one of "VANILLA", "FORGE", "SPIGOT", "BUKKIT", "PAPER", "FTBA", "SPONGEVANILLA", "CURSEFORGE"
-  type: "SPIGOT"
+  ## The type of Minecraft server to run, check for related settings below
+  ## Common types: "VANILLA", "FABRIC", "FORGE", "SPIGOT", "BUKKIT", "PAPER",
+  ## "FTBA", "SPONGEVANILLA", "AUTO_CURSEFORGE"
+  ## ref: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms
+  type: "VANILLA"
   # If type is set to FORGE, this sets the version; this is ignored if forgeInstallerUrl is set
-  forgeVersion: # If type is set to SPONGEVANILLA, this sets the version
-
-  spongeVersion: # If type is set to FORGE, this sets the URL to download the Forge installer
-
-  forgeInstallerUrl: # If type is set to BUKKIT, this sets the URL to download the Bukkit package
-
-  bukkitDownloadUrl: # If type is set to SPIGOT, this sets the URL to download the Spigot package
-
-  spigotDownloadUrl: # If type is set to PAPER, this sets the URL to download the PaperSpigot package
-
-  paperDownloadUrl: # If type is set to FTBA, this sets the modpack to run
-
-  ftbModpackId: # If type is set to FTBA and a modpack is set, this sets the version to run
-
-  ftbModpackVersionId: # If type is set to CURSEFORGE, this sets the server mod to run. Can also provide url to curseforge package.
-
-  cfServerMod: # Set to true if running Feed The Beast and get an error like "unable to launch forgemodloader"
-
+  forgeVersion:
+  # If type is set to FORGE, this sets the URL to download the Forge installer
+  forgeInstallerUrl:
+  # If type is set to SPONGEVANILLA, this sets the version
+  spongeVersion:
+  # If type is set to BUKKIT, this sets the URL to download the Bukkit package
+  bukkitDownloadUrl:
+  # If type is set to SPIGOT, this sets the URL to download the Spigot package
+  spigotDownloadUrl:
+  # If type is set to PAPER, this sets the URL to download the PaperSpigot package
+  paperDownloadUrl:
+  # If type is set to FTBA, this sets the modpack to run
+  ftbModpackId:
+  # If type is set to FTBA and a modpack is set, this sets the version to run
+  ftbModpackVersionId:
+  # If type is set to CURSEFORGE, this sets the server mod to run. Can also provide url to curseforge package.
+  cfServerMod:
+  ## If type is set to FABRIC, this sets the version of fabric server launcher
+  ## to use. Defaults to latest available for minecraftServer.version.
+  ##
+  ## For a custom launcher, see: https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms/server-types/fabric/
+  fabricLauncherVersion:
+  ## If type is set to FABRIC, this sets the version of fabric-loader to use.
+  ## Defaults to latest available for minecraftServer.version.
+  fabricLoaderVersion:
+  # Set to true if running Feed The Beast and get an error like "unable to launch forgemodloader"
   ftbLegacyJavaFixer: default
   # One of: peaceful, easy, normal, and hard
-  difficulty: normal
+  difficulty: easy
   # A comma-separated list of player names to whitelist.
-  whitelist: # A comma-separated list of player names who should be admins.
-
-  ops: Ahojlinki
-
+  whitelist:
+  # A comma-separated list of player names who should be admins.
+  ops:
   # A server icon URL for server listings. Auto-scaled and transcoded.
-  icon: https://www.mrk.cz/Data/Otazky/654602.jpg
+  icon:
   # Max connected players.
-  maxPlayers: 10
+  maxPlayers: default
   # This sets the maximum possible size in blocks, expressed as a radius, that the world border can obtain.
-  maxWorldSize: 10000
+  maxWorldSize: default
   # Allows players to travel to the Nether.
   allowNether: default
   # Allows server to announce when a player gets an achievement.
@@ -185,9 +234,9 @@ minecraftServer:
   # If set to true, players will be set to spectator mode if they die.
   hardcore: default
   # The maximum height in which building is allowed.
-  maxBuildHeight: 256
+  maxBuildHeight: default
   # The maximum number of milliseconds a single tick may take before the server watchdog stops the server with the message. -1 disables this entirely.
-  maxTickTime: 60000
+  maxTickTime: default
   # Determines if animals will be able to spawn.
   spawnAnimals: default
   # Determines if monsters will be spawned.
@@ -195,17 +244,15 @@ minecraftServer:
   # Determines if villagers will be spawned.
   spawnNPCs: default
   # Sets the area that non-ops can not edit (0 to disable)
-  spawnProtection: 16
+  spawnProtection: default
   # Max view distance (in chunks).
-  viewDistance: 20
+  viewDistance: default
   # Define this if you want a specific map generation seed.
-  levelSeed: "-8985846747452277621"
+  levelSeed:
   # One of: creative, survival, adventure, spectator
   gameMode: survival
   # Message of the Day
-  motd: "§2§lVítej §a§lna §2§lserveru §e§l§nSuchý§e §6§l§nRohlík§f ☻§r
-
-    §4§l!!! §4Jestli jsi Tomáš nebo Mirek tak táhni do pekla §4§l!!!"
+  motd: "Welcome to Minecraft on Kubernetes!"
   # If true, enable player-vs-player damage.
   pvp: default
   # One of: DEFAULT, FLAT, LARGEBIOMES, AMPLIFIED, CUSTOMIZED
@@ -215,24 +262,24 @@ minecraftServer:
   generatorSettings:
   worldSaveName: world
   # If set, this URL will be downloaded at startup and used as a starting point
-  downloadWorldUrl: # force re-download of server file
-
+  downloadWorldUrl:
+  # force re-download of server file
   forceReDownload: false
   # If set, the modpack at this URL will be downloaded at startup
-  downloadModpackUrl: # If true, old versions of downloaded mods will be replaced with new ones from downloadModpackUrl
-
+  downloadModpackUrl:
+  # If true, old versions of downloaded mods will be replaced with new ones from downloadModpackUrl
   removeOldMods: false
   # A list of VanillaTweaks Share Codes to download. (https://vanillatweaks.net/share#wUq1iz => "wUq1iz")
   vanillaTweaksShareCodes: []
   # Optional URI to a resource pack. The player may choose to use it.
-  resourcePackUrl: # Optional SHA-1 digest of the resource pack, in lowercase hexadecimal.
-
+  resourcePackUrl:
+  # Optional SHA-1 digest of the resource pack, in lowercase hexadecimal.
   # It is recommended to specify this, because it is used to verify the integrity of the resource pack.
-  resourcePackSha: # When true, players will be prompted for a response and will be disconnected if they decline the required pack
-
+  resourcePackSha:
+  # When true, players will be prompted for a response and will be disconnected if they decline the required pack
   resourcePackEnforce: false
   # Check accounts against Minecraft account service.
-  onlineMode: false
+  onlineMode: default
   # Require public key to be signed by Mojang to join
   enforceSecureProfile: default
   # If you adjust this, you may need to adjust resources.requests above to match.
@@ -241,30 +288,28 @@ minecraftServer:
   jvmOpts: ""
   # Options like -X that need to proceed general JVM options
   jvmXXOpts: ""
-  # By default, the server configuration will be created and set based on the following environment variables, but only the first time the server is started
-  # If you would like to override the server configuration each time the container starts up, you can set this to true
-  # see https://github.com/itzg/docker-minecraft-server#server-configuration
-  overrideServerProperties: true
+  overrideServerProperties: default
   # DEPRECATED: use top-level rconServiceAnnotations instead
   serviceAnnotations: {}
   serviceType: ClusterIP
   ## Set the port used if the serviceType is NodePort
-  nodePort: # Set the external port of the service, usefull when using the LoadBalancer service type
-
+  nodePort:
+  # Set the external port of the service, usefull when using the LoadBalancer service type
   servicePort: 25565
   clusterIP:
-  loadBalancerIP: # loadBalancerSourceRanges: []
-
+  loadBalancerClass:
+  loadBalancerIP:
+  # loadBalancerSourceRanges: []
   ## Set the externalTrafficPolicy in the Service to either Cluster or Local
   # externalTrafficPolicy: Cluster
   externalIPs:
+  ipFamilies:
+  ipFamilyPolicy:
 
   # List with URLs and paths to jar files, additionally may be a directory with jars
   # This works for both mods and plugins depending on server type
   modUrls: []
-  pluginUrls:
-  #  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/129/artifact/target/LoginSecurity-3.2.1-Spigot.jar
-  #  - https://ci.codemc.io/view/Author/job/lenis0012/job/LoginSecurity/lastStableBuild/artifact/target/LoginSecurity-Spigot-3.3.2-SNAPSHOT.jar
+  pluginUrls: []
 
   # A list of Spigot resources/plugins IDs to download.
   spigetResources: []
@@ -275,10 +320,10 @@ minecraftServer:
   # A list of Modrinth project slugs with optional version after colon
   modrinth:
     projects: []
-    # Downloads Modrinth project dependencies marked as optional
-    optionalDependencies: false
+    # Specifies whether to download Modrinth dependencies. The allowed values are: none, required, optional
+    downloadDependencies: none
     # The version type is used to determine the newest version to use from each project. The allowed values are: release, beta, alpha
-    allowedVersionType: release
+    allowedVersionType: default
 
   # Config for AUTO_CURSEFORGE server type
   autoCurseForge:
@@ -328,12 +373,18 @@ minecraftServer:
     ## Set the external port if the rcon serviceType is NodePort
     nodePort:
     clusterIP:
+    loadBalancerClass:
     loadBalancerIP:
-      # loadBalancerSourceRanges: []
-      ## Set the externalTrafficPolicy in the Service to either Cluster or Local
-      # externalTrafficPolicy: Cluster
+    # loadBalancerSourceRanges: []
+    ## Set the externalTrafficPolicy in the Service to either Cluster or Local
+    # externalTrafficPolicy: Cluster
 
-  extraPorts: []
+  ## set this to false to not have colorized logs
+  tty: true
+
+  extraPorts:
+    []
+
     # These options allow you to expose another port from the Minecraft server, plugins such
     # as dynmap (8123) and bluemap (8100) will require this for access to their web interfaces
     #
@@ -374,7 +425,8 @@ minecraftServer:
 ## Additional minecraft container environment variables
 ## Values can be either variable values or `valueFrom` yaml
 ##
-extraEnv: {}
+extraEnv:
+  {}
   # some_variable: some value
   # another_variable:
   #   valueFrom:
@@ -389,6 +441,8 @@ envFrom: []
 persistence:
   labels: {}
   annotations: {}
+  ## specify an alternative volume to be mounted to /data instead of datadir.
+  # altDataVolumeName: ""
   ## minecraft data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -396,11 +450,13 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  storageClass: nfs-csi
+  # storageClass: "-"
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
-    enabled: true
-    Size: 2Gi
+    enabled: false
+    Size: 1Gi
+    accessModes:
+      - ReadWriteOnce
     # existingClaim: nil
     ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
     # subPath: /path/to/dataDir
@@ -429,6 +485,10 @@ mcbackup:
   #  wait 2 minutes before starting
   initialDelay: 2m
 
+  # Sets `BACKUP_NAME`, defaults to `minecraftServer.worldSaveName`
+  # WARN: When using restic and sharing the `mcbackup.resticRepository` across multiple minecraft server deployments: either `mcbackup.backupName` or `mcbackup.resticHostname` must be unique!
+  backupName:
+
   # ***set to 0 or smaller, script will run once and exit.  DO NOT SET TO 0 or smaller, this will cause K8s to kill your pod!***
   # backupInterval="1.5d" -> backup every one and a half days (36 hours)
   # backupInterval="2h 30m" -> backup every two and a half hours
@@ -448,7 +508,7 @@ mcbackup:
   # logs folder and cache (used by i.e. PaperMC server).
   excludes: "*.jar,cache,logs"
 
-  # backup methods, see https://github.com/itzg/docker-mc-backup e.g. tar, rclone, restic
+  # backup methods, see https://github.com/itzg/docker-mc-backup e.g. tar, rclone, restic, rsync
   backupMethod: tar
   # tar and rclone methods
   destDir: /backups
@@ -466,8 +526,8 @@ mcbackup:
 
   # see https://rclone.org/ for details
   # this value is evaluated as a template
-  rcloneConfig: # [remote]
-
+  rcloneConfig:
+  # [remote]
   # type = google cloud storage
   # client_id =
   # client_secret =
@@ -484,14 +544,21 @@ mcbackup:
   resticAdditionalTags: "mc_backups"
   # see https://restic.readthedocs.io/en/latest/060_forget.html
   pruneResticRetention: "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75"
+  # Sets `RESTIC_HOSTNAME`
+  # Required because the container hostname changes on every recreate of the pod which prevents restic from pruning snapshots from previous pods/hostnames
+  # WARN: When using restic and sharing the `mcbackup.resticRepository` across multiple minecraft server deployments: either `mcbackup.backupName` or `mcbackup.resticHostname` must be unique!
+  resticHostname:
 
   # At least one of RESTIC_PASSWORD* env variables need to be defined, see https://restic.readthedocs.io/en/latest/030_preparing_a_new_repo.html
-  resticEnvs: {} # RESTIC_PASSWORD: restic-password
+  resticEnvs:
+    {}
+    # RESTIC_PASSWORD: restic-password
 
   ## Additional minecraft container environment variables
   ## Values can be either variable values or `valueFrom` yaml
   ##
-  extraEnv: {}
+  extraEnv:
+    {}
     # some_variable: some value
     # another_variable:
     #   valueFrom:
@@ -505,7 +572,7 @@ mcbackup:
 
   resources:
     requests:
-      memory: 1024Mi
+      memory: 512Mi
       cpu: 500m
 
   persistence:
@@ -523,3 +590,10 @@ mcbackup:
       enabled: false
       # existingClaim: nil
       Size: 1Gi
+      accessModes:
+        - ReadWriteOnce
+# dnsPolicy: ClusterFirst
+# dnsConfig:
+#   options:
+#   - name: ndots
+#     value: '1'
